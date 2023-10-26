@@ -1,18 +1,9 @@
-from flask import Flask
-import os
-from flask import Flask, render_template, request, url_for, redirect
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import mapped_column
-from sqlalchemy import String,Integer
-from sqlalchemy.orm import Mapped
-from flask import jsonify
-from flask import request
 
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import JWTManager
+from flask import Flask, render_template, request, url_for, redirect, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase,mapped_column, Mapped
+from sqlalchemy import String,Integer
+from flask_jwt_extended import create_access_token,get_jwt_identity,jwt_required,JWTManager
 
 from sqlalchemy.sql import func
 class Base(DeclarativeBase):
@@ -21,7 +12,7 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:Your_Password_Here!@localhost:3306/users"
+app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:Your_Password_here!@localhost:3306/users"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -50,6 +41,11 @@ def hello():
 def login():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
+    #db lookup username ->
+     #if username not present in db
+    #username = None
+    if username == None:
+        return jsonify({"msg":"username not found"}), 404
     if username != "test" or password != "test":
         return jsonify({"msg": "Bad username or password"}), 401
 
