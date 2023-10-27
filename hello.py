@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase,mapped_column, Mapped
 from sqlalchemy import String,Integer
 from flask_jwt_extended import create_access_token,get_jwt_identity,jwt_required,JWTManager
+from werkzeug.utils import secure_filename
 
 from sqlalchemy.sql import func
 class Base(DeclarativeBase):
@@ -12,7 +13,7 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:Your_Password_here!@localhost:3306/users"
+app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:YourPassHere!@localhost:3306/users"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -43,9 +44,9 @@ def login():
     password = request.json.get("password", None)
     #db lookup username ->
      #if username not present in db
-    #username = None
+    username = None
     if username == None:
-        return jsonify({"msg":"username not found"}), 404
+        return  'bad request!', 400
     if username != "test" or password != "test":
         return jsonify({"msg": "Bad username or password"}), 401
 
@@ -61,3 +62,11 @@ def protected():
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+	
+@app.route('/uploader', methods = ['GET', 'POST'])
+def upload_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      f.save(secure_filename(f.filename))
+      return 'file uploaded successfully'
