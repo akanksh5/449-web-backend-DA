@@ -5,6 +5,7 @@ from sqlalchemy.orm import DeclarativeBase,mapped_column, Mapped
 from sqlalchemy import String,Integer
 from flask_jwt_extended import create_access_token,get_jwt_identity,jwt_required,JWTManager
 from werkzeug.utils import secure_filename
+import os
 
 from sqlalchemy.sql import func
 class Base(DeclarativeBase):
@@ -13,8 +14,13 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:YourPassHere!@localhost:3306/users"
+app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:Password!@localhost:3306/users"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+UPLOAD_FOLDER = './files/'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 db.init_app(app)
 
 class User(db.Model):
@@ -63,10 +69,36 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 	
 @app.route('/uploader', methods = ['GET', 'POST'])
 def upload_file():
-   if request.method == 'POST':
-      f = request.files['file']
-      f.save(secure_filename(f.filename))
-      return 'file uploaded successfully'
+#    if request.method == 'POST':
+#       f = request.files['file']
+#       f.save(secure_filename(f.filename))
+#       return 'file uploaded successfully'
+     if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        try:
+            os.mkdir(app.config['UPLOAD_FOLDER'])
+        except OSError:
+            print ("Creation of the directory %s failed" % app.config['UPLOAD_FOLDER'])
+        else:
+            print ("Successfully created the directory %s " % app.config['UPLOAD_FOLDER'])
+        if not allowed_file(file.filename):
+            return 'invalid file type uploaded',401
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return 'file uploaded successfully'
