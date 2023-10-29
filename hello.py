@@ -39,7 +39,7 @@ class Movie(db.Model):
     rating:  Mapped[int] = mapped_column(Integer)
 
 # Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = "test"  # Change this!
+app.config["JWT_SECRET_KEY"] = ""  # Change this!
 jwt = JWTManager(app)
 
 
@@ -118,9 +118,14 @@ def createmovie():
     return "Hello World!"
 
 
-@app.route('/movie/{movieName}', methods = ['GET']) #Read
-def getmovie():
-    return "Hello World!"
+@app.route('/movie/<movieName>', methods = ['GET']) #Read
+@jwt_required()
+def getmovie(movieName):
+    current_user = get_jwt_identity()
+    obj =Movie.query.filter_by(username=current_user,moviename=movieName).first_or_404()
+    result={'Movie Name':obj.moviename,'Rating':obj.rating,'Username':obj.username}
+    return jsonify({'Movies':result})
+
 
 @app.route('/movie/<moviename>', methods = ['PUT']) #Update
 @jwt_required()
