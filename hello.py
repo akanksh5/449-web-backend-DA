@@ -1,11 +1,13 @@
 
-from flask import Flask, render_template, request, url_for, redirect, jsonify
+from flask import Flask, request, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase,mapped_column, Mapped
 from sqlalchemy import String,Integer
 from flask_jwt_extended import create_access_token,get_jwt_identity,jwt_required,JWTManager
 from werkzeug.utils import secure_filename
 import os
+from flask import Response
+import json
 
 from sqlalchemy.sql import func
 class Base(DeclarativeBase):
@@ -95,10 +97,11 @@ def registeruser():
 
 @app.route('/movies')
 def showmovies():
-    # Movie name
-    # Movie Rating
-    # User
-    return "Hello World!"
+    movies = Movie.query.filter().all()
+    result = []
+    for i in movies:
+        result.append({'Movie Name':i.moviename,'Rating':i.rating,'Username':i.username})
+    return jsonify({'Movies':result})
 
 @app.route('/movie', methods = [ 'POST']) #Create
 @jwt_required()
