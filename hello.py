@@ -15,6 +15,7 @@ db = SQLAlchemy(model_class=Base)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:Test!@localhost:3306/movie_system"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 UPLOAD_FOLDER = './files/'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -55,7 +56,7 @@ def login():
     password = request.json.get("password", None)
     #db lookup username ->
      #if username not present in db
-    #username = None
+    username = None
     if username == None:
         return  'bad request!', 400
     if username != "test" or password != "test":
@@ -77,7 +78,6 @@ def protected():
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 @app.route('/movies')
 def showmovies():
@@ -133,6 +133,7 @@ def deletemovie(moviename):
     # Movie Rating
     # User
     return "Hello World!"
+
 	
 @app.route('/uploader', methods = ['GET', 'POST'])
 def upload_file():
