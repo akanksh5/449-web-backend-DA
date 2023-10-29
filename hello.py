@@ -37,7 +37,7 @@ class Movie(db.Model):
     rating:  Mapped[int] = mapped_column(Integer)
 
 # Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = "super-secret-1"  # Change this!
+app.config["JWT_SECRET_KEY"] = "test"  # Change this!
 jwt = JWTManager(app)
 
 
@@ -56,7 +56,7 @@ def login():
     password = request.json.get("password", None)
     #db lookup username ->
      #if username not present in db
-    username = None
+   # username = None
     if username == None:
         return  'bad request!', 400
     if username != "test" or password != "test":
@@ -79,6 +79,20 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/register', methods = [ 'POST']) #Create
+def registeruser():
+   #username=request.json.get("username", None)
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+    email = request.json.get("email", None)
+    if username == None:
+        return "username is absent",404
+    user = User(username=username,password=password,email=email)
+    db.session.add(user)
+    db.session.commit()
+    return "Hello World!"
+
+
 @app.route('/movies')
 def showmovies():
     # Movie name
@@ -98,49 +112,37 @@ def createmovie():
     movie = Movie(username=current_user,moviename=moviename,rating=movierating)
     db.session.add(movie)
     db.session.commit()
-    # Movie name
-    # Movie Rating
-    # User
     return "Hello World!"
 
 
 @app.route('/movie/{movieName}', methods = ['GET']) #Read
 def getmovie():
-    # Movie name
-    # Movie Rating
-    # User
     return "Hello World!"
 
-@app.route('/movie', methods = ['PUT']) #Update
-def updatemovie():
-    # Movie name
-    # Movie Rating
-    # User
+@app.route('/movie/<moviename>', methods = ['PUT']) #Update
+@jwt_required()
+def updatemovie(moviename):
+    movierating = request.json.get("movierating", 0)
+    current_user = get_jwt_identity()
+    if moviename == None:
+        return "movie name is absent",404
+    movie = Movie.query.filter_by(username=current_user,moviename=moviename).update(dict(rating=movierating))
+    db.session.commit()
     return "Hello World!"
 
 @app.route('/movie/<moviename>', methods = ['DELETE']) #Delete
 @jwt_required()
 def deletemovie(moviename):
-  #  id = 2
-   # obj = Movie(id=2)
     print("Hi")
     current_user = get_jwt_identity()
     obj =Movie.query.filter_by(username=current_user,moviename=moviename).first()
     db.session.delete(obj)
     db.session.commit()
-
-    # Movie name
-    # Movie Rating
-    # User
     return "Hello World!"
 
 	
 @app.route('/uploader', methods = ['GET', 'POST'])
 def upload_file():
-#    if request.method == 'POST':
-#       f = request.files['file']
-#       f.save(secure_filename(f.filename))
-#       return 'file uploaded successfully'
      if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
