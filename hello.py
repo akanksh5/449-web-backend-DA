@@ -14,7 +14,7 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] =environ.get('SQLALCHEMY_DATABASE_URI') #"mysql://root:Galvanize1397!@localhost:3306/movie_system"
+app.config['SQLALCHEMY_DATABASE_URI'] =environ.get('SQLALCHEMY_DATABASE_URI')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] =environ.get('SQLALCHEMY_TRACK_MODIFICATIONS') 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
