@@ -18,6 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] =environ.get('SQLALCHEMY_DATABASE_URI')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] =environ.get('SQLALCHEMY_TRACK_MODIFICATIONS') 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
 app.config['UPLOAD_FOLDER'] = environ.get('UPLOAD_FOLDER')
 
