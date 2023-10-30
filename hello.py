@@ -1,13 +1,11 @@
-
 from flask import Flask, request, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase,mapped_column, Mapped
 from sqlalchemy import String,Integer
 from flask_jwt_extended import create_access_token,get_jwt_identity,jwt_required,JWTManager
 from werkzeug.utils import secure_filename
+from os import environ 
 import os
-from flask import Response
-import json
 
 from sqlalchemy.sql import func
 class Base(DeclarativeBase):
@@ -16,13 +14,12 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] ="mysql://root:Test!@localhost:3306/movie_system"
+app.config['SQLALCHEMY_DATABASE_URI'] =environ.get('SQLALCHEMY_DATABASE_URI') #"mysql://root:Galvanize1397!@localhost:3306/movie_system"
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-UPLOAD_FOLDER = './files/'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] =environ.get('SQLALCHEMY_TRACK_MODIFICATIONS') 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = environ.get('UPLOAD_FOLDER')
 
 db.init_app(app)
 
@@ -39,7 +36,7 @@ class Movie(db.Model):
     rating:  Mapped[int] = mapped_column(Integer)
 
 # Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = ""  # Change this!
+app.config["JWT_SECRET_KEY"] = environ.get("JWT_SECRET_KEY")  # Change this!
 jwt = JWTManager(app)
 
 
@@ -56,26 +53,11 @@ def hello():
 def login():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
-    #db lookup username ->
-     #if username not present in db
-   # username = None
-    if username == None:
-        return  'bad request!', 400
-    if username != "test" or password != "test":
-        return jsonify({"msg": "Bad username or password"}), 401
-
-    access_token = create_access_token(identity=username)
-    return jsonify(access_token=access_token)
-
-
-# Protect a route with jwt_required, which will kick out requests
-# without a valid JWT present.
-@app.route("/protected", methods=["GET"])
-@jwt_required()
-def protected():
-    # Access the identity of the current user with get_jwt_identity
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+    obj =User.query.filter_by(username=username,password=password).first()
+    if obj:
+        access_token = create_access_token(identity=username)
+        return jsonify(access_token=access_token)
+    return jsonify({"msg": "invalid username or password"}), 401
 
 def allowed_file(filename):
     return '.' in filename and \
