@@ -13,6 +13,6 @@
   UPLOAD_FOLDER<br>
   JWT_SECRET_KEY**
 - Connect to the database and create a database based on the configuration value.
-- Run the following command - ```flask --apphello run ```
+- Run the following command - ```flask --app movieratings run ```
 - Using Postman, hit the respective endpoints
 - Project Contributors - Dhanush KJ & Akanksh Jagadish
