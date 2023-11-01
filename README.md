@@ -4,10 +4,10 @@
 - Has support for JWT Authentication with /register and /login endpoints.
 - Application developed using Flask as the backend framework and MySQL for the relational database.
 ### Installation
-- Install and source the virtual env => https://docs.python.org/3/library/venv.html
+- Install and source the virtual env (```https://docs.python.org/3/library/venv.html```)
 - Install all the python3 libraries required for this application using the following command<br>
  ```pip3 install -r requirements.txt```
--  Install MySQL => https://dev.mysql.com/downloads/installer/
+-  Install MySQL (```https://dev.mysql.com/downloads/installer/```)
 - Create a .env file and source the following environment Variables<br>
   **SQLALCHEMY_DATABASE_URI<br>   SQLALCHEMY_TRACK_MODIFICATIONS<br>
   UPLOAD_FOLDER<br>
